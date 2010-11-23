@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Linux kernel version: 2.6.32.9
-# Sat Nov 20 18:05:03 2010
+# Tue Nov 23 14:29:09 2010
 #
 CONFIG_ARM=y
 CONFIG_HAVE_PWM=y
@@ -436,7 +436,7 @@ CONFIG_BINFMT_ELF=y
 # CONFIG_CORE_DUMP_DEFAULT_ELF_HEADERS is not set
 CONFIG_HAVE_AOUT=y
 # CONFIG_BINFMT_AOUT is not set
-CONFIG_BINFMT_MISC=y
+# CONFIG_BINFMT_MISC is not set
 
 #
 # Power management options
