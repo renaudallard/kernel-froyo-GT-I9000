@@ -1440,8 +1440,8 @@ static __u32 twothirdsMD4Transform(__u32 const buf[4], __u32 const in[12])
 #define REKEY_INTERVAL (300 * HZ)
 /*
  * Bit layout of the tcp sequence numbers (before adding current time):
- * bit 24-31: increased after every key exchange
- * bit 0-23: hash(source,dest)
+ * bit 28-31: increased after every key exchange
+ * bit 0-27: hash(source,dest)
  *
  * The implementation is similar to the algorithm described
  * in the Appendix of RFC 1185, except that
@@ -1450,16 +1450,13 @@ static __u32 twothirdsMD4Transform(__u32 const buf[4], __u32 const in[12])
  * 	to a (source,dest) tulple dependent forward jump of the
  * 	clock by 0..2^(HASH_BITS+1)
  *
- * Thus the average ISN wraparound time is 68 minutes instead of
- * 4.55 hours.
- *
  * SMP cleanup and lock avoidance with poor man's RCU.
  * 			Manfred Spraul <manfred@colorfullife.com>
  *
  */
-#define COUNT_BITS 8
+#define COUNT_BITS 4
 #define COUNT_MASK ((1 << COUNT_BITS) - 1)
-#define HASH_BITS 24
+#define HASH_BITS 28
 #define HASH_MASK ((1 << HASH_BITS) - 1)
 
 static struct keydata {
