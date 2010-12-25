@@ -152,7 +152,7 @@ extern struct proc_dir_entry *proc_mkdir_mode(const char *name, mode_t mode,
 static inline struct proc_dir_entry *proc_create(const char *name, mode_t mode,
 	struct proc_dir_entry *parent, const struct file_operations *proc_fops)
 {
-	return proc_create_data(name, S_IRUSR, parent, proc_fops, NULL);
+	return proc_create_data(name, mode, parent, proc_fops, NULL);
 }
 
 static inline struct proc_dir_entry *create_proc_read_entry(const char *name,

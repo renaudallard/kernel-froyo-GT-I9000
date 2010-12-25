@@ -480,7 +480,7 @@ static const struct file_operations proc_bus_pci_dev_operations = {
 static int __init pci_proc_init(void)
 {
 	struct pci_dev *dev = NULL;
-	proc_bus_pci_dir = proc_mkdir_mode("bus/pci", S_IRUSR | S_IXUSR, NULL);
+	proc_bus_pci_dir = proc_mkdir("bus/pci", NULL);
 	proc_create("devices", 0, proc_bus_pci_dir,
 		    &proc_bus_pci_dev_operations);
 	proc_initialized = 1;
