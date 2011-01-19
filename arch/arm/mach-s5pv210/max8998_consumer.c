@@ -85,18 +85,18 @@ enum PMIC_VOLTAGE {
 /* frequency voltage matching table */
 static const unsigned int frequency_match_1GHZ[][4] = {
 /* frequency, Mathced VDD ARM voltage , Matched VDD INT*/
-#if 1
+#if 0
         {1000000, 1275, 1100, 0},
         {800000, 1200, 1100, 1},
         {400000, 1050, 1100, 2},
         {200000, 950, 1100, 4},
         {100000, 950, 1000, 5},
-#else //just for dvs test
-        {1000000, 1250, 1100, 0},
-        {800000, 1250, 1100, 1},
-        {400000, 1250, 1100, 2},
-        {200000, 1250, 1100, 4},
-        {100000, 950, 1000, 5},
+#else //Renaud Undervolting
+        {1000000, 1200, 1100, 0},
+        {800000, 1150, 1100, 1},
+        {400000, 1000, 1100, 2},
+        {200000, 900, 1100, 4},
+        {100000, 850, 1000, 5},
 #endif
 };
 
