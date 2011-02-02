@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Linux kernel version: 2.6.32.9
-# Tue Jan 25 17:11:02 2011
+# Tue Feb  1 23:24:47 2011
 #
 CONFIG_ARM=y
 CONFIG_HAVE_PWM=y
@@ -385,6 +385,7 @@ CONFIG_HAVE_MLOCKED_PAGE_BIT=y
 CONFIG_DEFAULT_MMAP_MIN_ADDR=8192
 CONFIG_ALIGNMENT_TRAP=y
 CONFIG_UACCESS_WITH_MEMCPY=y
+CONFIG_CC_STACKPROTECTOR=y
 
 #
 # Boot options
