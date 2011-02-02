@@ -38,6 +38,12 @@
 #include <asm/mach/time.h>
 #include <mach/regs-clock.h>
 
+#ifdef CONFIG_CC_STACKPROTECTOR
+#include <linux/stackprotector.h>
+unsigned long __stack_chk_guard __read_mostly;
+EXPORT_SYMBOL(__stack_chk_guard);
+#endif
+
 #ifdef CONFIG_KERNEL_DEBUG_SEC
 #include <linux/kernel_sec_common.h>
 struct pt_regs kernel_sec_core_ureg_dump;
