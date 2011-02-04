@@ -1028,6 +1028,9 @@ direct_io_worker(int rw, struct kiocb *iocb, struct inode *inode,
 	if (dio->bio)
 		dio_bio_submit(dio);
 
+	/* All IO is now issued, send it on its way */
+	blk_run_address_space(inode->i_mapping);
+
 	/*
 	 * It is possible that, we return short IO due to end of file.
 	 * In that case, we need to release all the pages we got hold on.
@@ -1054,11 +1057,8 @@ direct_io_worker(int rw, struct kiocb *iocb, struct inode *inode,
 	    ((rw & READ) || (dio->result == dio->size)))
 		ret = -EIOCBQUEUED;
 
-	if (ret != -EIOCBQUEUED) {
-                /* All IO is now issued, send it on its way */
-		blk_run_address_space(inode->i_mapping);
+	if (ret != -EIOCBQUEUED)
 		dio_await_completion(dio);
-	}
 
 	/*
 	 * Sync will always be dropping the final ref and completing the
