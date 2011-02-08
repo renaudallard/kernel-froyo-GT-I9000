@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Linux kernel version: 2.6.32.9
-# Wed Feb  2 08:05:00 2011
+# Tue Feb  8 19:06:31 2011
 #
 CONFIG_ARM=y
 CONFIG_HAVE_PWM=y
@@ -2008,7 +2008,7 @@ CONFIG_DEBUG_SPINLOCK_SLEEP=y
 CONFIG_STACKTRACE=y
 # CONFIG_DEBUG_KOBJECT is not set
 CONFIG_DEBUG_BUGVERBOSE=y
-CONFIG_DEBUG_INFO=y
+# CONFIG_DEBUG_INFO is not set
 # CONFIG_DEBUG_VM is not set
 # CONFIG_DEBUG_WRITECOUNT is not set
 CONFIG_DEBUG_MEMORY_INIT=y
