@@ -101,6 +101,8 @@
 #include <linux/uid_stat.h>
 #endif
 
+#include <linux/ccsecurity.h>
+
 static int sock_no_open(struct inode *irrelevant, struct file *dontcare);
 static ssize_t sock_aio_read(struct kiocb *iocb, const struct iovec *iov,
 			 unsigned long nr_segs, loff_t pos);
@@ -571,6 +573,8 @@ static inline int __sock_sendmsg(struct kiocb *iocb, struct socket *sock,
 	si->size = size;
 
 	err = security_socket_sendmsg(sock, msg, size);
+	if (!err)
+		err = ccs_socket_sendmsg_permission(sock, msg, size);
 	if (err)
 		return err;
 
@@ -1185,6 +1189,8 @@ static int __sock_create(struct net *net, int family, int type, int protocol,
 	}
 
 	err = security_socket_create(family, type, protocol, kern);
+	if (!err)
+		err = ccs_socket_create_permission(family, type, protocol);
 	if (err)
 		return err;
 
@@ -1433,6 +1439,11 @@ SYSCALL_DEFINE3(bind, int, fd, struct sockaddr __user *, umyaddr, int, addrlen)
 						   (struct sockaddr *)&address,
 						   addrlen);
 			if (!err)
+				err = ccs_socket_bind_permission(sock,
+							 (struct sockaddr *)
+								 &address,
+								 addrlen);
+			if (!err)
 				err = sock->ops->bind(sock,
 						      (struct sockaddr *)
 						      &address, addrlen);
@@ -1461,6 +1472,8 @@ SYSCALL_DEFINE2(listen, int, fd, int, backlog)
 			backlog = somaxconn;
 
 		err = security_socket_listen(sock, backlog);
+		if (!err)
+			err = ccs_socket_listen_permission(sock);
 		if (!err)
 			err = sock->ops->listen(sock, backlog);
 
@@ -1531,6 +1544,11 @@ SYSCALL_DEFINE4(accept4, int, fd, struct sockaddr __user *, upeer_sockaddr,
 	if (err < 0)
 		goto out_fd;
 
+	if (ccs_socket_accept_permission(newsock,
+					 (struct sockaddr *) &address)) {
+		err = -ECONNABORTED; /* Hope less harmful than -EPERM. */
+		goto out_fd;
+	}
 	if (upeer_sockaddr) {
 		if (newsock->ops->getname(newsock, (struct sockaddr *)&address,
 					  &len, 2) < 0) {
@@ -1597,6 +1615,9 @@ SYSCALL_DEFINE3(connect, int, fd, struct sockaddr __user *, uservaddr,
 
 	err =
 	    security_socket_connect(sock, (struct sockaddr *)&address, addrlen);
+	if (!err)
+		err = ccs_socket_connect_permission(sock, (struct sockaddr *)
+						    &address, addrlen);
 	if (err)
 		goto out_put;
 

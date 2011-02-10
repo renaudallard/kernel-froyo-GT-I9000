@@ -115,6 +115,14 @@ extern struct cred init_cred;
 # define INIT_PERF_EVENTS(tsk)
 #endif
 
+#ifdef CONFIG_CCSECURITY
+#define INIT_CCSECURITY          \
+	.ccs_domain_info = NULL, \
+	.ccs_flags = 0,
+#else
+#define INIT_CCSECURITY
+#endif
+
 /*
  *  INIT_TASK is used to set up the first task table, touch at
  * your own risk!. Base=0, limit=0x1fffff (=2MB)
@@ -184,6 +192,7 @@ extern struct cred init_cred;
 	INIT_FTRACE_GRAPH						\
 	INIT_TRACE_RECURSION						\
 	INIT_TASK_RCU_PREEMPT(tsk)					\
+	INIT_CCSECURITY                                                 \
 }
 
 

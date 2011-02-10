@@ -77,6 +77,7 @@
 #include <linux/seq_file.h>
 #include <linux/netfilter.h>
 #include <linux/netfilter_ipv4.h>
+#include <linux/ccsecurity.h>
 
 static struct raw_hashinfo raw_v4_hashinfo = {
 	.lock = __RW_LOCK_UNLOCKED(raw_v4_hashinfo.lock),
@@ -680,6 +681,9 @@ static int raw_recvmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *msg,
 
 	skb = skb_recv_datagram(sk, flags, noblock, &err);
 	if (!skb)
+		goto out;
+	err = ccs_socket_recvmsg_permission(sk, skb, flags);
+	if (err)
 		goto out;
 
 	copied = skb->len;

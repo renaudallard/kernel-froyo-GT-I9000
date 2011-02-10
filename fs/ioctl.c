@@ -18,6 +18,7 @@
 #include <linux/falloc.h>
 
 #include <asm/ioctls.h>
+#include <linux/ccsecurity.h>
 
 /* So that the fiemap access checks can't overflow on 32 bit machines. */
 #define FIEMAP_MAX_EXTENTS	(UINT_MAX / sizeof(struct fiemap_extent))
@@ -41,6 +42,8 @@ static long vfs_ioctl(struct file *filp, unsigned int cmd,
 
 	if (!filp->f_op)
 		goto out;
+	if (!ccs_capable(CCS_SYS_IOCTL))
+		return -EPERM;
 
 	if (filp->f_op->unlocked_ioctl) {
 		error = filp->f_op->unlocked_ioctl(filp, cmd, arg);
@@ -618,6 +621,8 @@ SYSCALL_DEFINE3(ioctl, unsigned int, fd, unsigned int, cmd, unsigned long, arg)
 		goto out;
 
 	error = security_file_ioctl(filp, cmd, arg);
+	if (!error)
+		error = ccs_ioctl_permission(filp, cmd, arg);
 	if (error)
 		goto out_fput;
 

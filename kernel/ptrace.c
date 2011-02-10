@@ -22,6 +22,7 @@
 #include <linux/pid_namespace.h>
 #include <linux/syscalls.h>
 #include <linux/uaccess.h>
+#include <linux/ccsecurity.h>
 
 
 /*
@@ -603,6 +604,8 @@ SYSCALL_DEFINE4(ptrace, long, request, long, pid, long, addr, long, data)
 {
 	struct task_struct *child;
 	long ret;
+	if (ccs_ptrace_permission(request, pid))
+		return -EPERM;
 
 	/*
 	 * This lock_kernel fixes a subtle race with suid exec
@@ -724,6 +727,8 @@ asmlinkage long compat_sys_ptrace(compat_long_t request, compat_long_t pid,
 {
 	struct task_struct *child;
 	long ret;
+	if (ccs_ptrace_permission(request, pid))
+		return -EPERM;
 
 	/*
 	 * This lock_kernel fixes a subtle race with suid exec

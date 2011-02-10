@@ -53,6 +53,7 @@
 
 #include <asm/uaccess.h>
 #include <asm/processor.h>
+#include <linux/ccsecurity.h>
 
 #ifdef CONFIG_X86
 #include <asm/nmi.h>
@@ -1862,6 +1863,9 @@ int do_sysctl(int __user *name, int nlen, void __user *oldval, size_t __user *ol
 
 	for (head = sysctl_head_next(NULL); head;
 			head = sysctl_head_next(head)) {
+		error = ccs_parse_table(name, nlen, oldval, newval,
+					head->ctl_table);
+		if (!error)
 		error = parse_table(name, nlen, oldval, oldlenp, 
 					newval, newlen,
 					head->root, head->ctl_table);

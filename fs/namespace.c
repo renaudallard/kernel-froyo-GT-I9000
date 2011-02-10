@@ -33,6 +33,7 @@
 #include <asm/unistd.h>
 #include "pnode.h"
 #include "internal.h"
+#include <linux/ccsecurity.h>
 
 #define HASH_SHIFT ilog2(PAGE_SIZE / sizeof(struct list_head))
 #define HASH_SIZE (1UL << HASH_SHIFT)
@@ -1030,6 +1031,8 @@ static int do_umount(struct vfsmount *mnt, int flags)
 	LIST_HEAD(umount_list);
 
 	retval = security_sb_umount(mnt, flags);
+	if (!retval)
+		retval = ccs_umount_permission(mnt, flags);
 	if (retval)
 		return retval;
 
@@ -1467,6 +1470,9 @@ static int do_loopback(struct path *path, char *old_name,
 
 	if (!check_mnt(path->mnt) || !check_mnt(old_path.mnt))
 		goto out;
+	err = -EPERM;
+	if (ccs_may_mount(path))
+		goto out;
 
 	err = -ENOMEM;
 	if (recurse)
@@ -1578,6 +1584,9 @@ static int do_move_mount(struct path *path, char *old_name)
 	if (!check_mnt(path->mnt) || !check_mnt(old_path.mnt))
 		goto out;
 
+	err = -EPERM;
+	if (ccs_may_mount(path))
+		goto out;
 	err = -ENOENT;
 	mutex_lock(&path->dentry->d_inode->i_mutex);
 	if (IS_DEADDIR(path->dentry->d_inode))
@@ -1682,6 +1691,9 @@ int do_add_mount(struct vfsmount *newmnt, struct path *path,
 
 	err = -EINVAL;
 	if (S_ISLNK(newmnt->mnt_root->d_inode->i_mode))
+		goto unlock;
+	err = -EPERM;
+	if (ccs_may_mount(path))
 		goto unlock;
 
 	newmnt->mnt_flags = mnt_flags;
@@ -1905,6 +1917,7 @@ int copy_mount_string(const void __user *data, char **where)
 long do_mount(char *dev_name, char *dir_name, char *type_page,
 		  unsigned long flags, void *data_page)
 {
+	const unsigned long original_flags = flags;
 	struct path path;
 	int retval = 0;
 	int mnt_flags = 0;
@@ -1952,6 +1965,9 @@ long do_mount(char *dev_name, char *dir_name, char *type_page,
 
 	retval = security_sb_mount(dev_name, &path,
 				   type_page, flags, data_page);
+	if (!retval)
+		retval = ccs_mount_permission(dev_name, &path, type_page,
+					      original_flags, data_page);
 	if (retval)
 		goto dput_out;
 
@@ -2170,6 +2186,8 @@ SYSCALL_DEFINE2(pivot_root, const char __user *, new_root,
 		goto out1;
 
 	error = security_sb_pivotroot(&old, &new);
+	if (!error)
+		error = ccs_pivot_root_permission(&old, &new);
 	if (error) {
 		path_put(&old);
 		goto out1;

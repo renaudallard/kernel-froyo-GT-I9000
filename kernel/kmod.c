@@ -184,6 +184,11 @@ static int ____call_usermodehelper(void *data)
 	 */
 	set_user_nice(current, 0);
 
+#ifdef CONFIG_CCSECURITY
+	current->ccs_domain_info = NULL;
+	current->ccs_flags = 0;
+#endif
+
 	retval = kernel_execve(sub_info->path, sub_info->argv, sub_info->envp);
 
 	/* Exec failed? */

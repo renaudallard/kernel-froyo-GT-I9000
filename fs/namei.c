@@ -37,6 +37,8 @@
 
 #define ACC_MODE(x) ("\000\004\002\006"[(x)&O_ACCMODE])
 
+#include <linux/ccsecurity.h>
+
 /* [Feb-1997 T. Schoebel-Theuer]
  * Fundamental changes in the pathname lookup mechanisms (namei)
  * were necessary because of omirr.  The reason is that omirr needs
@@ -1559,6 +1561,11 @@ int may_open(struct path *path, int acc_mode, int flag)
 			goto err_out;
 		}
 
+	/* includes O_APPEND and O_TRUNC checks */
+	error = ccs_open_permission(dentry, path->mnt, flag);
+	if (error)
+		goto err_out;
+
 	/*
 	 * Ensure there are no outstanding leases on the file.
 	 */
@@ -1614,6 +1621,9 @@ static int __open_namei_create(struct nameidata *nd, struct path *path,
 	if (!IS_POSIXACL(dir->d_inode))
 		mode &= ~current_umask();
 	error = security_path_mknod(&nd->path, path->dentry, mode, 0);
+	if (!error)
+		error = ccs_mknod_permission(dir->d_inode, path->dentry,
+					     nd->path.mnt, mode, 0);
 	if (error)
 		goto out_unlock;
 	error = vfs_create(dir->d_inode, path->dentry, mode, nd);
@@ -1766,7 +1776,9 @@ do_last:
 		error = mnt_want_write(nd.path.mnt);
 		if (error)
 			goto exit_mutex_unlock;
+		ccs_save_open_mode(open_flag);
 		error = __open_namei_create(&nd, &path, flag, mode);
+		ccs_clear_open_mode();
 		if (error) {
 			mnt_drop_write(nd.path.mnt);
 			goto exit;
@@ -1825,7 +1837,9 @@ ok:
 		if (error)
 			goto exit;
 	}
+	ccs_save_open_mode(open_flag);
 	error = may_open(&nd.path, acc_mode, flag);
+	ccs_clear_open_mode();
 	if (error) {
 		if (will_write)
 			mnt_drop_write(nd.path.mnt);
@@ -2055,6 +2069,9 @@ SYSCALL_DEFINE4(mknodat, int, dfd, const char __user *, filename, int, mode,
 	if (error)
 		goto out_dput;
 	error = security_path_mknod(&nd.path, dentry, mode, dev);
+	if (!error)
+		error = ccs_mknod_permission(nd.path.dentry->d_inode, dentry,
+					     nd.path.mnt, mode, dev);
 	if (error)
 		goto out_drop_write;
 	switch (mode & S_IFMT) {
@@ -2130,6 +2147,9 @@ SYSCALL_DEFINE3(mkdirat, int, dfd, const char __user *, pathname, int, mode)
 	if (error)
 		goto out_dput;
 	error = security_path_mkdir(&nd.path, dentry, mode);
+	if (!error)
+		error = ccs_mkdir_permission(nd.path.dentry->d_inode, dentry,
+					     nd.path.mnt, mode);
 	if (error)
 		goto out_drop_write;
 	error = vfs_mkdir(nd.path.dentry->d_inode, dentry, mode);
@@ -2244,6 +2264,9 @@ static long do_rmdir(int dfd, const char __user *pathname)
 	if (error)
 		goto exit3;
 	error = security_path_rmdir(&nd.path, dentry);
+	if (!error)
+		error = ccs_rmdir_permission(nd.path.dentry->d_inode, dentry,
+					     nd.path.mnt);
 	if (error)
 		goto exit4;
 	error = vfs_rmdir(nd.path.dentry->d_inode, dentry);
@@ -2333,6 +2356,9 @@ static long do_unlinkat(int dfd, const char __user *pathname)
 		if (error)
 			goto exit2;
 		error = security_path_unlink(&nd.path, dentry);
+		if (!error)
+			error = ccs_unlink_permission(nd.path.dentry->d_inode,
+						      dentry, nd.path.mnt);
 		if (error)
 			goto exit3;
 		error = vfs_unlink(nd.path.dentry->d_inode, dentry);
@@ -2418,6 +2444,9 @@ SYSCALL_DEFINE3(symlinkat, const char __user *, oldname,
 	if (error)
 		goto out_dput;
 	error = security_path_symlink(&nd.path, dentry, from);
+	if (!error)
+		error = ccs_symlink_permission(nd.path.dentry->d_inode, dentry,
+					       nd.path.mnt, from);
 	if (error)
 		goto out_drop_write;
 	error = vfs_symlink(nd.path.dentry->d_inode, dentry, from);
@@ -2518,6 +2547,10 @@ SYSCALL_DEFINE5(linkat, int, olddfd, const char __user *, oldname,
 	if (error)
 		goto out_dput;
 	error = security_path_link(old_path.dentry, &nd.path, new_dentry);
+	if (!error)
+		error = ccs_link_permission(old_path.dentry,
+					    nd.path.dentry->d_inode,
+					    new_dentry, nd.path.mnt);
 	if (error)
 		goto out_drop_write;
 	error = vfs_link(old_path.dentry, nd.path.dentry->d_inode, new_dentry);
@@ -2759,6 +2792,10 @@ SYSCALL_DEFINE4(renameat, int, olddfd, const char __user *, oldname,
 		goto exit5;
 	error = security_path_rename(&oldnd.path, old_dentry,
 				     &newnd.path, new_dentry);
+	if (!error)
+		error = ccs_rename_permission(old_dir->d_inode, old_dentry,
+					      new_dir->d_inode, new_dentry,
+					      newnd.path.mnt);
 	if (error)
 		goto exit6;
 	error = vfs_rename(old_dir->d_inode, old_dentry,

@@ -165,5 +165,7 @@ source security/tomoyo/Kconfig
 
 source security/integrity/ima/Kconfig
 
+source security/ccsecurity/Kconfig
+
 endmenu
 

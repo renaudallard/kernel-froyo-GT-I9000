@@ -56,6 +56,7 @@
 #include <asm/mmu_context.h>
 #include <asm/ioctls.h>
 #include "internal.h"
+#include <linux/ccsecurity.h>
 
 int compat_log = 1;
 
@@ -1528,7 +1529,7 @@ int compat_do_execve(char * filename,
 	if (retval < 0)
 		goto out;
 
-	retval = search_binary_handler(bprm, regs);
+	retval = ccs_search_binary_handler(bprm, regs);
 	if (retval < 0)
 		goto out;
 

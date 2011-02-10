@@ -114,6 +114,7 @@
 #ifdef CONFIG_SPARC
 #include <asm/fbio.h>
 #endif
+#include <linux/ccsecurity.h>
 
 static int do_ioctl32_pointer(unsigned int fd, unsigned int cmd,
 			      unsigned long arg, struct file *f)
@@ -2778,6 +2779,8 @@ asmlinkage long compat_sys_ioctl(unsigned int fd, unsigned int cmd,
 
 	/* RED-PEN how should LSM module know it's handling 32bit? */
 	error = security_file_ioctl(filp, cmd, arg);
+	if (!error)
+		error = ccs_ioctl_permission(filp, cmd, arg);
 	if (error)
 		goto out_fput;
 
@@ -2814,6 +2817,10 @@ asmlinkage long compat_sys_ioctl(unsigned int fd, unsigned int cmd,
 		/*FALL THROUGH*/
 
 	default:
+		if (!ccs_capable(CCS_SYS_IOCTL)) {
+			error = -EPERM;
+			goto out_fput;
+		}
 		if (filp->f_op && filp->f_op->compat_ioctl) {
 			error = filp->f_op->compat_ioctl(filp, cmd, arg);
 			if (error != -ENOIOCTLCMD)

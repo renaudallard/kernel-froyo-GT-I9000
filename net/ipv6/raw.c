@@ -59,6 +59,7 @@
 
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
+#include <linux/ccsecurity.h>
 
 static struct raw_hashinfo raw_v6_hashinfo = {
 	.lock = __RW_LOCK_UNLOCKED(raw_v6_hashinfo.lock),
@@ -464,6 +465,9 @@ static int rawv6_recvmsg(struct kiocb *iocb, struct sock *sk,
 
 	skb = skb_recv_datagram(sk, flags, noblock, &err);
 	if (!skb)
+		goto out;
+	err = ccs_socket_recvmsg_permission(sk, skb, flags);
+	if (err)
 		goto out;
 
 	copied = skb->len;

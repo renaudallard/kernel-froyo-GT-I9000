@@ -1,0 +1,106 @@
+config CCSECURITY
+	bool "CCSecurity support"
+	default m
+	help
+	  Say Y here to support non-LSM version of TOMOYO Linux.
+	  http://tomoyo.sourceforge.jp/
+
+config CCSECURITY_LKM
+	bool "Compile as loadable kernel module"
+	default n
+	depends on CCSECURITY && MODULES
+	help
+	  Say Y here if you want to keep vmlinux's size as small as possible.
+
+config CCSECURITY_DISABLE_BY_DEFAULT
+	bool "Disable by default"
+	default n
+	depends on CCSECURITY
+	help
+	  Say Y here if you want TOMOYO disabled by default.
+	  To enable TOMOYO, pass ccsecurity=on to kernel command line.
+	  To disable TOMOYO, pass ccsecurity=off to kernel command line.
+
+config CCSECURITY_MAX_ACCEPT_ENTRY
+	int "Default maximal count for learning mode"
+	default 2048
+	range 0 2147483647
+	depends on CCSECURITY
+	help
+	  This is the default value for maximal ACL entries
+	  that are automatically appended into policy at "learning mode".
+	  Some programs access thousands of objects, so running
+	  such programs in "learning mode" dulls the system response
+	  and consumes much memory.
+	  This is the safeguard for such programs.
+
+config CCSECURITY_DEFAULT_LOADER
+	string "Default policy loader"
+	default "/sbin/ccs-init"
+	depends on CCSECURITY
+	---help---
+	  This is the default pathname of policy loader which is called before
+	  activation. You can override using CCS_loader= kernel command line
+	  option.
+
+config CCSECURITY_ALTERNATIVE_TRIGGER
+	string "Alternative activation trigger"
+	default "/sbin/ccs-start"
+	depends on CCSECURITY
+	---help---
+	  Some environments do not have /sbin/init . In such environments,
+	  we need to use different program's pathname (e.g. /init or /linuxrc )
+	  as activation trigger.
+
+config CCSECURITY_BUILTIN_INITIALIZERS
+	string "Built-in domain initializer programs"
+	default "/sbin/modprobe /sbin/hotplug"
+	depends on CCSECURITY
+	---help---
+	  Some programs are executed from initrd/initramfs before /sbin/init
+	  starts.
+
+	  Since policy is loaded when /sbin/init starts, it is impossible to
+	  run such programs outside the <kernel> domain. Usually it is fine.
+
+	  But if such programs continue running when /sbin/init starts, such
+	  programs will reside in the <kernel> domain.
+	  If such programs executes /bin/sh , you will give the <kernel> domain
+	  permission to execute /bin/sh ; I think you don't want to do so.
+
+	  This option allows you to chase such programs away from the <kernel>
+	  domain so that you won't give the <kernel> domain permission to
+	  execute /bin/sh .
+
+config CCSECURITY_AUDIT
+	bool "Auditing interface support"
+	default y
+	depends on CCSECURITY
+	help
+	  This option enables /proc/ccs/grant_log and /proc/ccs/reject_log
+	  interfaces. You may disable these interfaces if you want to apply for
+	  HDD-less systems (e.g. embedded systems).
+
+config CCSECURITY_MAX_GRANT_LOG
+	int "Default maximal count for grant log"
+	default 1024
+	range 0 2147483647
+	depends on CCSECURITY_AUDIT
+	help
+	  This is the default value for maximal entries for
+	  access grant logs that the kernel can hold on memory.
+	  You can read the log via /proc/ccs/grant_log.
+	  If you don't need access grant logs,
+	  you may set this value to 0.
+
+config CCSECURITY_MAX_REJECT_LOG
+	int "Default maximal count for reject log"
+	default 1024
+	range 0 2147483647
+	depends on CCSECURITY_AUDIT
+	help
+	  This is the default value for maximal entries for
+	  access reject logs that the kernel can hold on memory.
+	  You can read the log via /proc/ccs/reject_log.
+	  If you don't need access reject logs,
+	  you may set this value to 0.
