@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Linux kernel version: 2.6.32.9
-# Wed Feb 23 07:22:46 2011
+# Fri Feb 25 08:09:16 2011
 #
 CONFIG_ARM=y
 CONFIG_HAVE_PWM=y
@@ -152,15 +152,13 @@ CONFIG_LBDAF=y
 #
 CONFIG_IOSCHED_NOOP=y
 # CONFIG_IOSCHED_AS is not set
-CONFIG_IOSCHED_DEADLINE=y
+# CONFIG_IOSCHED_DEADLINE is not set
 # CONFIG_IOSCHED_CFQ is not set
-# CONFIG_IOSCHED_BFQ is not set
 # CONFIG_DEFAULT_AS is not set
-CONFIG_DEFAULT_DEADLINE=y
+# CONFIG_DEFAULT_DEADLINE is not set
 # CONFIG_DEFAULT_CFQ is not set
-# CONFIG_DEFAULT_BFQ is not set
-# CONFIG_DEFAULT_NOOP is not set
-CONFIG_DEFAULT_IOSCHED="deadline"
+CONFIG_DEFAULT_NOOP=y
+CONFIG_DEFAULT_IOSCHED="noop"
 CONFIG_FREEZER=y
 
 #
