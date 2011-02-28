@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Linux kernel version: 2.6.32.9
-# Fri Feb 25 09:17:33 2011
+# Fri Feb 25 12:13:30 2011
 #
 CONFIG_ARM=y
 CONFIG_HAVE_PWM=y
@@ -152,13 +152,13 @@ CONFIG_LBDAF=y
 #
 CONFIG_IOSCHED_NOOP=y
 # CONFIG_IOSCHED_AS is not set
-# CONFIG_IOSCHED_DEADLINE is not set
+CONFIG_IOSCHED_DEADLINE=y
 # CONFIG_IOSCHED_CFQ is not set
 # CONFIG_DEFAULT_AS is not set
-# CONFIG_DEFAULT_DEADLINE is not set
+CONFIG_DEFAULT_DEADLINE=y
 # CONFIG_DEFAULT_CFQ is not set
-CONFIG_DEFAULT_NOOP=y
-CONFIG_DEFAULT_IOSCHED="noop"
+# CONFIG_DEFAULT_NOOP is not set
+CONFIG_DEFAULT_IOSCHED="deadline"
 CONFIG_FREEZER=y
 
 #
@@ -2173,6 +2173,7 @@ CONFIG_CRYPTO_TWOFISH_COMMON=y
 # CONFIG_CRYPTO_DEFLATE is not set
 # CONFIG_CRYPTO_ZLIB is not set
 # CONFIG_CRYPTO_LZO is not set
+
 #
 # Random Number Generation
 #
