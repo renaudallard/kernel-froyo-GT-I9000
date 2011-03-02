@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Linux kernel version: 2.6.32.9
-# Fri Feb 25 12:13:30 2011
+# Wed Mar  2 00:09:07 2011
 #
 CONFIG_ARM=y
 CONFIG_HAVE_PWM=y
@@ -1083,7 +1083,7 @@ CONFIG_CONSOLE_TRANSLATIONS=y
 CONFIG_VT_CONSOLE=y
 CONFIG_HW_CONSOLE=y
 # CONFIG_VT_HW_CONSOLE_BINDING is not set
-CONFIG_DEVMEM=y
+# CONFIG_DEVMEM is not set
 # CONFIG_DEVKMEM is not set
 # CONFIG_SERIAL_NONSTANDARD is not set
 # CONFIG_NOZOMI is not set
