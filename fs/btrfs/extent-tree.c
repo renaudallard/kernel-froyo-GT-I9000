@@ -4578,7 +4578,6 @@ int btrfs_reserve_extent(struct btrfs_trans_handle *trans,
 {
 	int ret;
 	u64 search_start = 0;
-	struct btrfs_fs_info *info = root->fs_info;
 
 	data = btrfs_get_alloc_profile(root, data);
 again:
@@ -4586,17 +4585,9 @@ again:
 	 * the only place that sets empty_size is btrfs_realloc_node, which
 	 * is not called recursively on allocations
 	 */
-	if (empty_size || root->ref_cows) {
-		if (!(data & BTRFS_BLOCK_GROUP_METADATA)) {
-			ret = do_chunk_alloc(trans, root->fs_info->extent_root,
-				     2 * 1024 * 1024,
-				     BTRFS_BLOCK_GROUP_METADATA |
-				     (info->metadata_alloc_profile &
-				      info->avail_metadata_alloc_bits), 0);
-		}
+	if (empty_size || root->ref_cows)
 		ret = do_chunk_alloc(trans, root->fs_info->extent_root,
 				     num_bytes + 2 * 1024 * 1024, data, 0);
-	}
 
 	WARN_ON(num_bytes < root->sectorsize);
 	ret = find_free_extent(trans, root, num_bytes, empty_size,
@@ -4919,8 +4910,16 @@ struct extent_buffer *btrfs_init_new_buffer(struct btrfs_trans_handle *trans,
 	btrfs_set_buffer_uptodate(buf);
 
 	if (root->root_key.objectid == BTRFS_TREE_LOG_OBJECTID) {
-		set_extent_dirty(&root->dirty_log_pages, buf->start,
-			 buf->start + buf->len - 1, GFP_NOFS);
+		/*
+		 * we allow two log transactions at a time, use different
+		 * EXENT bit to differentiate dirty pages.
+		 */
+		if (root->log_transid % 2 == 0)
+			set_extent_dirty(&root->dirty_log_pages, buf->start,
+					buf->start + buf->len - 1, GFP_NOFS);
+		else
+			set_extent_new(&root->dirty_log_pages, buf->start,
+					buf->start + buf->len - 1, GFP_NOFS);
 	} else {
 		set_extent_dirty(&trans->transaction->dirty_pages, buf->start,
 			 buf->start + buf->len - 1, GFP_NOFS);
