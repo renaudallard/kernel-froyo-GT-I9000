@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Linux kernel version: 2.6.32.9
-# Fri Mar 11 11:33:35 2011
+# Fri Mar 18 10:12:02 2011
 #
 CONFIG_ARM=y
 CONFIG_HAVE_PWM=y
@@ -1846,7 +1846,7 @@ CONFIG_FS_POSIX_ACL=y
 # CONFIG_OCFS2_FS is not set
 CONFIG_BTRFS_FS=y
 # CONFIG_BTRFS_FS_POSIX_ACL is not set
-# CONFIG_NILFS2_FS is not set
+CONFIG_NILFS2_FS=y
 CONFIG_FILE_LOCKING=y
 CONFIG_FSNOTIFY=y
 # CONFIG_DNOTIFY is not set
