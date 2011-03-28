@@ -24,11 +24,11 @@
 
 #include <asm/sections.h>
 
-#ifdef CONFIG_KALLSYMS_ALL
+/*#ifdef CONFIG_KALLSYMS_ALL
 #define all_var 1
-#else
+#else*/
 #define all_var 0
-#endif
+//#endif
 
 /*
  * These will be re-linked against their real values
@@ -370,9 +370,9 @@ void __print_symbol(const char *fmt, unsigned long address)
 {
 	char buffer[KSYM_SYMBOL_LEN];
 
-	sprint_symbol(buffer, address);
+//	sprint_symbol(buffer, address);
 
-	printk(fmt, buffer);
+//	printk(fmt, buffer);
 }
 EXPORT_SYMBOL(__print_symbol);
 
@@ -523,7 +523,7 @@ static const struct file_operations kallsyms_operations = {
 
 static int __init kallsyms_init(void)
 {
-	proc_create("kallsyms", 0444, NULL, &kallsyms_operations);
+//	proc_create("kallsyms", 0444, NULL, &kallsyms_operations);
 	return 0;
 }
 device_initcall(kallsyms_init);
