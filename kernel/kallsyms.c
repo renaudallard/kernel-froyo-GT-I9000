@@ -24,11 +24,11 @@
 
 #include <asm/sections.h>
 
-/*#ifdef CONFIG_KALLSYMS_ALL
+#ifdef CONFIG_KALLSYMS_ALL
 #define all_var 1
-#else*/
+#else
 #define all_var 0
-//#endif
+#endif
 
 /*
  * These will be re-linked against their real values

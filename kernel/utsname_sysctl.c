@@ -92,7 +92,7 @@ static struct ctl_table uts_kern_table[] = {
 		.procname	= "osrelease",
 		.data		= init_uts_ns.name.release,
 		.maxlen		= sizeof(init_uts_ns.name.release),
-		.mode		= 0444,
+		.mode		= 0400,
 		.proc_handler	= proc_do_uts_string,
 		.strategy	= sysctl_uts_string,
 	},
