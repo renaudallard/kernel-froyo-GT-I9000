@@ -61,7 +61,6 @@
 #include <asm/mmu_context.h>
 #include <asm/tlb.h>
 #include "internal.h"
-#include <linux/ccsecurity.h>
 
 int core_uses_pid;
 char core_pattern[CORENAME_MAX_SIZE] = "core";
@@ -1377,7 +1376,7 @@ int do_execve(char * filename,
 		goto out;
 
 	current->flags &= ~PF_KTHREAD;
-	retval = ccs_search_binary_handler(bprm, regs);
+	retval = search_binary_handler(bprm,regs);
 	if (retval < 0)
 		goto out;
 

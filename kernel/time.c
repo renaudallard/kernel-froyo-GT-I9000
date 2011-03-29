@@ -41,7 +41,6 @@
 
 #include <asm/uaccess.h>
 #include <asm/unistd.h>
-#include <linux/ccsecurity.h>
 
 #include "timeconst.h"
 
@@ -93,8 +92,6 @@ SYSCALL_DEFINE1(stime, time_t __user *, tptr)
 	err = security_settime(&tv, NULL);
 	if (err)
 		return err;
-	if (!ccs_capable(CCS_SYS_SETTIME))
-		return -EPERM;
 
 	do_settimeofday(&tv);
 	return 0;
@@ -166,8 +163,6 @@ int do_sys_settimeofday(struct timespec *tv, struct timezone *tz)
 	error = security_settime(tv, tz);
 	if (error)
 		return error;
-	if (!ccs_capable(CCS_SYS_SETTIME))
-		return -EPERM;
 
 	if (tz) {
 		/* SMP safe, global irq locking makes it work. */

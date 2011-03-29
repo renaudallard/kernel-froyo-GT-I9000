@@ -23,7 +23,6 @@
 #include <asm/poll.h>
 #include <asm/siginfo.h>
 #include <asm/uaccess.h>
-#include <linux/ccsecurity.h>
 
 void set_close_on_exec(unsigned int fd, int flag)
 {
@@ -155,9 +154,6 @@ static int setfl(int fd, struct file * filp, unsigned long arg)
 	 * and the file is open for write.
 	 */
 	if (((arg ^ filp->f_flags) & O_APPEND) && IS_APPEND(inode))
-		return -EPERM;
-
-	if (((arg ^ filp->f_flags) & O_APPEND) && ccs_rewrite_permission(filp))
 		return -EPERM;
 
 	/* O_NOATIME can only be set by the owner or superuser */

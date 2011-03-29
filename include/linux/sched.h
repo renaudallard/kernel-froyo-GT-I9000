@@ -43,8 +43,6 @@
 
 #ifdef __KERNEL__
 
-struct ccs_domain_info;
-
 struct sched_param {
 	int sched_priority;
 };
@@ -1547,10 +1545,6 @@ struct task_struct {
 	unsigned long trace_recursion;
 #endif /* CONFIG_TRACING */
 	unsigned long stack_start;
-#ifdef CONFIG_CCSECURITY
-       struct ccs_domain_info *ccs_domain_info;
-       u32 ccs_flags;
-#endif
 };
 
 /* Future-safe accessor for struct task_struct's cpus_allowed. */

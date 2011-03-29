@@ -114,7 +114,6 @@
 #include <linux/mount.h>
 #include <net/checksum.h>
 #include <linux/security.h>
-#include <linux/ccsecurity.h>
 
 static struct hlist_head unix_socket_table[UNIX_HASH_SIZE + 1];
 static DEFINE_SPINLOCK(unix_table_lock);
@@ -838,10 +837,6 @@ static int unix_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
 		if (err)
 			goto out_mknod_dput;
 		err = security_path_mknod(&nd.path, dentry, mode, 0);
-		if (!err)
-			err = ccs_mknod_permission(nd.path.dentry->d_inode,
-						   dentry, nd.path.mnt, mode,
-						   0);
 		if (err)
 			goto out_mknod_drop_write;
 		err = vfs_mknod(nd.path.dentry->d_inode, dentry, mode, 0);

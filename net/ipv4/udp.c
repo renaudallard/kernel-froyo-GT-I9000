@@ -105,7 +105,6 @@
 #include <net/checksum.h>
 #include <net/xfrm.h>
 #include "udp_impl.h"
-#include <linux/ccsecurity.h>
 
 struct udp_table udp_table;
 EXPORT_SYMBOL(udp_table);
@@ -197,8 +196,7 @@ int udp_lib_get_port(struct sock *sk, unsigned short snum,
 			 */
 			do {
 				if (low <= snum && snum <= high &&
-				    !test_bit(snum / UDP_HTABLE_SIZE, bitmap)
-				    && !ccs_lport_reserved(snum))
+				    !test_bit(snum / UDP_HTABLE_SIZE, bitmap))
 					goto found;
 				snum += rand;
 			} while (snum != first);
@@ -945,9 +943,6 @@ try_again:
 	skb = __skb_recv_datagram(sk, flags | (noblock ? MSG_DONTWAIT : 0),
 				  &peeked, &err);
 	if (!skb)
-		goto out;
-	err = ccs_socket_recvmsg_permission(sk, skb, flags);
-	if (err)
 		goto out;
 
 	ulen = skb->len - sizeof(struct udphdr);

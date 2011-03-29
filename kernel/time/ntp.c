@@ -14,7 +14,6 @@
 #include <linux/timex.h>
 #include <linux/time.h>
 #include <linux/mm.h>
-#include <linux/ccsecurity.h>
 
 /*
  * NTP timekeeping variables:
@@ -457,14 +456,9 @@ int do_adjtimex(struct timex *txc)
 		if (!(txc->modes & ADJ_OFFSET_READONLY) &&
 		    !capable(CAP_SYS_TIME))
 			return -EPERM;
-		if (!(txc->modes & ADJ_OFFSET_READONLY) &&
-		    !ccs_capable(CCS_SYS_SETTIME))
-			return -EPERM;
 	} else {
 		/* In order to modify anything, you gotta be super-user! */
 		 if (txc->modes && !capable(CAP_SYS_TIME))
-			return -EPERM;
-		if (txc->modes && !ccs_capable(CCS_SYS_SETTIME))
 			return -EPERM;
 
 		/*

@@ -27,7 +27,6 @@
 #include <linux/ptrace.h>
 
 #include <asm/uaccess.h>
-#include <linux/ccsecurity.h>
 
 /*
  * Note that the native side is already converted to a timespec, because
@@ -927,8 +926,6 @@ asmlinkage long compat_sys_stime(compat_time_t __user *tptr)
 	err = security_settime(&tv, NULL);
 	if (err)
 		return err;
-	if (!ccs_capable(CCS_SYS_SETTIME))
-		return -EPERM;
 
 	do_settimeofday(&tv);
 	return 0;

@@ -23,7 +23,6 @@
 #include <net/route.h>
 #include <net/tcp_states.h>
 #include <net/xfrm.h>
-#include <linux/ccsecurity.h>
 
 #ifdef INET_CSK_DEBUG
 const char inet_csk_timer_bug_msg[] = "inet_csk BUG: unknown timer value\n";
@@ -112,8 +111,6 @@ again:
 			head = &hashinfo->bhash[inet_bhashfn(net, rover,
 					hashinfo->bhash_size)];
 			spin_lock(&head->lock);
-			if (ccs_lport_reserved(rover))
-				goto next;
 			inet_bind_bucket_for_each(tb, node, &head->chain)
 				if (ib_net(tb) == net && tb->port == rover) {
 					if (tb->fastreuse > 0 &&

@@ -30,7 +30,6 @@
 #include <linux/audit.h>
 #include <linux/falloc.h>
 #include <linux/fs_struct.h>
-#include <linux/ccsecurity.h>
 
 int vfs_statfs(struct dentry *dentry, struct kstatfs *buf)
 {
@@ -276,9 +275,6 @@ static long do_sys_truncate(const char __user *pathname, loff_t length)
 	error = locks_verify_truncate(inode, NULL, length);
 	if (!error)
 		error = security_path_truncate(&path, length, 0);
-	if (!error)
-		error = ccs_truncate_permission(path.dentry, path.mnt, length,
-						0);
 	if (!error) {
 		vfs_dq_init(inode);
 		error = do_truncate(path.dentry, length, 0, NULL);
@@ -337,9 +333,6 @@ static long do_sys_ftruncate(unsigned int fd, loff_t length, int small)
 	if (!error)
 		error = security_path_truncate(&file->f_path, length,
 					       ATTR_MTIME|ATTR_CTIME);
-	if (!error)
-		error = ccs_truncate_permission(dentry, file->f_vfsmnt, length,
-						ATTR_MTIME|ATTR_CTIME);
 	if (!error)
 		error = do_truncate(dentry, length, ATTR_MTIME|ATTR_CTIME, file);
 out_putf:
@@ -594,8 +587,6 @@ SYSCALL_DEFINE1(chroot, const char __user *, filename)
 	error = -EPERM;
 	if (!capable(CAP_SYS_CHROOT))
 		goto dput_and_out;
-	if (ccs_chroot_permission(&path))
-		goto dput_and_out;
 
 	set_fs_root(current->fs, &path);
 	error = 0;
@@ -625,9 +616,6 @@ SYSCALL_DEFINE2(fchmod, unsigned int, fd, mode_t, mode)
 	err = mnt_want_write_file(file);
 	if (err)
 		goto out_putf;
-	err = ccs_chmod_permission(dentry, file->f_vfsmnt, mode);
-	if (err)
-		goto out_drop_write;
 	mutex_lock(&inode->i_mutex);
 	if (mode == (mode_t) -1)
 		mode = inode->i_mode;
@@ -635,7 +623,6 @@ SYSCALL_DEFINE2(fchmod, unsigned int, fd, mode_t, mode)
 	newattrs.ia_valid = ATTR_MODE | ATTR_CTIME;
 	err = notify_change(dentry, &newattrs);
 	mutex_unlock(&inode->i_mutex);
-out_drop_write:
 	mnt_drop_write(file->f_path.mnt);
 out_putf:
 	fput(file);
@@ -658,9 +645,6 @@ SYSCALL_DEFINE3(fchmodat, int, dfd, const char __user *, filename, mode_t, mode)
 	error = mnt_want_write(path.mnt);
 	if (error)
 		goto dput_and_out;
-	error = ccs_chmod_permission(path.dentry, path.mnt, mode);
-	if (error)
-		goto out_drop_write;
 	mutex_lock(&inode->i_mutex);
 	if (mode == (mode_t) -1)
 		mode = inode->i_mode;
@@ -668,7 +652,6 @@ SYSCALL_DEFINE3(fchmodat, int, dfd, const char __user *, filename, mode_t, mode)
 	newattrs.ia_valid = ATTR_MODE | ATTR_CTIME;
 	error = notify_change(path.dentry, &newattrs);
 	mutex_unlock(&inode->i_mutex);
-out_drop_write:
 	mnt_drop_write(path.mnt);
 dput_and_out:
 	path_put(&path);
@@ -717,8 +700,6 @@ SYSCALL_DEFINE3(chown, const char __user *, filename, uid_t, user, gid_t, group)
 	error = mnt_want_write(path.mnt);
 	if (error)
 		goto out_release;
-	error = ccs_chown_permission(path.dentry, path.mnt, user, group);
-	if (!error)
 	error = chown_common(path.dentry, user, group);
 	mnt_drop_write(path.mnt);
 out_release:
@@ -744,8 +725,6 @@ SYSCALL_DEFINE5(fchownat, int, dfd, const char __user *, filename, uid_t, user,
 	error = mnt_want_write(path.mnt);
 	if (error)
 		goto out_release;
-	error = ccs_chown_permission(path.dentry, path.mnt, user, group);
-	if (!error)
 	error = chown_common(path.dentry, user, group);
 	mnt_drop_write(path.mnt);
 out_release:
@@ -765,8 +744,6 @@ SYSCALL_DEFINE3(lchown, const char __user *, filename, uid_t, user, gid_t, group
 	error = mnt_want_write(path.mnt);
 	if (error)
 		goto out_release;
-	error = ccs_chown_permission(path.dentry, path.mnt, user, group);
-	if (!error)
 	error = chown_common(path.dentry, user, group);
 	mnt_drop_write(path.mnt);
 out_release:
@@ -790,8 +767,6 @@ SYSCALL_DEFINE3(fchown, unsigned int, fd, uid_t, user, gid_t, group)
 		goto out_fput;
 	dentry = file->f_path.dentry;
 	audit_inode(NULL, dentry);
-	error = ccs_chown_permission(dentry, file->f_vfsmnt, user, group);
-	if (!error)
 	error = chown_common(dentry, user, group);
 	mnt_drop_write(file->f_path.mnt);
 out_fput:
@@ -1185,8 +1160,6 @@ EXPORT_SYMBOL(sys_close);
  */
 SYSCALL_DEFINE0(vhangup)
 {
-	if (!ccs_capable(CCS_SYS_VHANGUP))
-		return -EPERM;
 	if (capable(CAP_SYS_TTY_CONFIG)) {
 		tty_vhangup_self();
 		return 0;

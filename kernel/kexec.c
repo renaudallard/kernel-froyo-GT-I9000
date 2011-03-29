@@ -37,7 +37,6 @@
 #include <asm/io.h>
 #include <asm/system.h>
 #include <asm/sections.h>
-#include <linux/ccsecurity.h>
 
 /* Per cpu memory for storing cpu states in case of system crash. */
 note_buf_t* crash_notes;
@@ -943,8 +942,6 @@ SYSCALL_DEFINE4(kexec_load, unsigned long, entry, unsigned long, nr_segments,
 
 	/* We only trust the superuser with rebooting the system. */
 	if (!capable(CAP_SYS_BOOT))
-		return -EPERM;
-	if (!ccs_capable(CCS_SYS_KEXEC_LOAD))
 		return -EPERM;
 
 	/*

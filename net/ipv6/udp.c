@@ -48,7 +48,6 @@
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
 #include "udp_impl.h"
-#include <linux/ccsecurity.h>
 
 int ipv6_rcv_saddr_equal(const struct sock *sk, const struct sock *sk2)
 {
@@ -211,9 +210,6 @@ try_again:
 	skb = __skb_recv_datagram(sk, flags | (noblock ? MSG_DONTWAIT : 0),
 				  &peeked, &err);
 	if (!skb)
-		goto out;
-	err = ccs_socket_recvmsg_permission(sk, skb, flags);
-	if (err)
 		goto out;
 
 	ulen = skb->len - sizeof(struct udphdr);
