@@ -3,7 +3,6 @@ deps_config := \
 	drivers/crypto/Kconfig \
 	crypto/async_tx/Kconfig \
 	crypto/Kconfig \
-	security/ccsecurity/Kconfig \
 	security/integrity/ima/Kconfig \
 	security/tomoyo/Kconfig \
 	security/smack/Kconfig \
