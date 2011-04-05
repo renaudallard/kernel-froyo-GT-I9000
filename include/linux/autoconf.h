@@ -1,7 +1,7 @@
 /*
  * Automatically generated C config: don't edit
  * Linux kernel version: 2.6.32.9
- * Thu Mar 31 17:15:17 2011
+ * Tue Apr  5 14:11:54 2011
  */
 #define AUTOCONF_INCLUDED
 #define CONFIG_MMC_SDHCI_S3C_DMA 1
@@ -461,6 +461,7 @@
 #define CONFIG_SLIP_COMPRESSED 1
 #define CONFIG_HAS_WAKELOCK 1
 #define CONFIG_FUTEX 1
+#define CONFIG_SCHED_AUTOGROUP 1
 #define CONFIG_SERIO_LIBPS2 1
 #define CONFIG_IP_NF_MATCH_ECN 1
 #define CONFIG_MISC_DEVICES 1
