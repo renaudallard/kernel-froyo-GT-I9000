@@ -16,4 +16,4 @@ export CFLAGS="-static -Os -fstack-protector -fstack-protector-all"
 export LDFLAGS="-static -Os"
 export CPPFLAGS="-static -Os"
 
-echo "./configure --host=arm-none-linux-gnueabi --target=arm-none-linux-gnueabi"
+echo "ARM environment set"
