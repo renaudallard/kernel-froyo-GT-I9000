@@ -1,7 +1,7 @@
 /*
  * Automatically generated C config: don't edit
  * Linux kernel version: 2.6.32.9
- * Tue Apr  5 14:39:44 2011
+ * Mon Apr 11 11:05:06 2011
  */
 #define AUTOCONF_INCLUDED
 #define CONFIG_MMC_SDHCI_S3C_DMA 1
@@ -536,7 +536,6 @@
 #define CONFIG_VIDEO_MFC_MAX_INSTANCE 4
 #define CONFIG_NETFILTER_XT_MATCH_LENGTH 1
 #define CONFIG_XFRM_MIGRATE 1
-#define CONFIG_NILFS2_FS 1
 #define CONFIG_REED_SOLOMON 1
 #define CONFIG_MMC_SDHCI 1
 #define CONFIG_MMC_BLOCK 1
@@ -677,7 +676,7 @@
 #define CONFIG_CRYPTO_BLKCIPHER 1
 #define CONFIG_FAIR_GROUP_SCHED 1
 #define CONFIG_CPU_V7 1
-#define CONFIG_BROADCOM_WIFI_MODULE 1
+#define CONFIG_BROADCOM_WIFI 1
 #define CONFIG_HID 1
 #define CONFIG_IP_NF_RAW 1
 #define CONFIG_NLATTR 1
